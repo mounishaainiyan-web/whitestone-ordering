@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Whitestone Creamery</title>
+  <style>
+    body {
+      font-family: Arial;
+      background: #f5f5f5;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+    }
+    .category {
+      margin-top: 30px;
+    }
+    .item {
+      background: white;
+      padding: 10px;
+      margin: 8px 0;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    .price {
+      float: right;
+      font-weight: bold;
+      color: green;
+    }
+  </style>
+</head>
+<body>
+
+<h1>Whitestone Creamery 🍦</h1>
+
+<div id="menu"></div>
+
+<script>
+async function loadMenu() {
+  const res = await fetch("/api/menu"); // We’ll create this route
+  const data = await res.json();
+
+  const menuDiv = document.getElementById("menu");
+
+  data.forEach(category => {
+    const categoryDiv = document.createElement("div");
+    categoryDiv.className = "category";
+    categoryDiv.innerHTML = `<h2>${category.category}</h2>`;
+
+    category.items.forEach(item => {
+      const itemDiv = document.createElement("div");
+      itemDiv.className = "item";
+
+      let priceText = "";
+
+      if (typeof item.price === "object") {
+        priceText = Object.entries(item.price)
+          .map(([size, price]) => `${size}: ₹${price}`)
+          .join(" | ");
+      } else {
+        priceText = `₹${item.price}`;
+      }
+
+      itemDiv.innerHTML = `
+        ${item.name}
+        <span class="price">${priceText}</span>
+      `;
+
+      categoryDiv.appendChild(itemDiv);
+    });
+
+    menuDiv.appendChild(categoryDiv);
+  });
+}
+
+loadMenu();
+</script>
+
+</body>
+</html>
