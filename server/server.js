@@ -16,7 +16,8 @@ mongoose.connect("mongodb+srv://admin:Whitestone123@cluster0.6adfpad.mongodb.net
   app.get("/", (req, res) => {
   res.send("Whitestone Ordering Server is Running 🚀");
 });
+const PORT = process.env.PORT || 5000;
 
-app.listen(5000, () => {
-  console.log("Server running on port 5000");
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });
