@@ -16,9 +16,6 @@ app.use("/api/orders", orderRoutes);
 mongoose.connect("mongodb+srv://admin:Whitestone123@cluster0.6adfpad.mongodb.net/?retryWrites=true&w=majority")
   .then(() => console.log("MongoDB Atlas Connected"))
   .catch(err => console.error(err));
-  app.get("/", (req, res) => {
-  res.send("Whitestone Ordering Server is Running 🚀");
-});
 const menu = require("./menu");
 
 app.get("/api/menu", (req, res) => {
