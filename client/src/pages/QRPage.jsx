@@ -1,6 +1,8 @@
 import { QRCodeCanvas } from "qrcode.react";
 
 function QRPage() {
+
+  // ✅ Correct production URL
   const url = "https://whitestone-ordering.onrender.com/";
 
   return (
@@ -8,25 +10,20 @@ function QRPage() {
       style={{
         textAlign: "center",
         padding: "50px",
-        fontFamily: "Arial, sans-serif",
+        fontFamily: "Arial",
       }}
     >
       <h1>Scan To Order</h1>
 
-      <div style={{ marginTop: "30px" }}>
-        <QRCodeCanvas
-          value={url}
-          size={250}
-          bgColor={"#ffffff"}
-          fgColor={"#000000"}
-          level={"H"}
-          includeMargin={true}
-        />
-      </div>
+      <QRCodeCanvas
+        value={url}
+        size={250}
+      />
 
-      <p style={{ marginTop: "20px", fontSize: "16px" }}>
+      <p style={{ marginTop: "20px" }}>
         {url}
       </p>
+
     </div>
   );
 }
