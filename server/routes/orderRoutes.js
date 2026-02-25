@@ -2,10 +2,6 @@ const express = require("express");
 const router = express.Router();
 const Order = require("../models/Order");
 
-
-// ===============================
-// CREATE NEW ORDER
-// ===============================
 router.post("/", async (req, res) => {
   try {
     const newOrder = new Order({
@@ -28,9 +24,6 @@ router.post("/", async (req, res) => {
 });
 
 
-// ===============================
-// GET ALL ORDERS (Admin)
-// ===============================
 router.get("/", async (req, res) => {
   try {
     const orders = await Order.find().sort({ createdAt: -1 });
