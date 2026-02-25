@@ -11,15 +11,12 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// MongoDB connection
-mongoose.connect("mongodb+srv://admin:Whitestone123@cluster0.6adfpad.mongodb.net/?retryWrites=true&w=majority")
-.then(() => console.log("MongoDB Connected"))
-.catch(err => console.log(err));
 
 // API routes
 app.use("/api/orders", orderRoutes);
 
-// Menu API
+
+// Menu route
 const menu = require("../client/src/data/menu");
 
 app.get("/api/menu", (req, res) => {
@@ -27,22 +24,25 @@ app.get("/api/menu", (req, res) => {
 });
 
 
-// ================= SERVE REACT =================
+// ✅ Serve React frontend build
+app.use(express.static(path.join(__dirname, "../client/dist")));
 
-// Tell express to use React build folder
-const clientPath = path.join(__dirname, "../client/dist");
 
-app.use(express.static(clientPath));
-
-// Fix for React Router (/qr, /admin etc)
+// ✅ Fix React routing (IMPORTANT)
 app.get("*", (req, res) => {
-  res.sendFile(path.join(clientPath, "index.html"));
+  res.sendFile(path.join(__dirname, "../client/dist/index.html"));
 });
+
+
+// MongoDB connection
+mongoose.connect("mongodb+srv://admin:Whitestone123@cluster0.6adfpad.mongodb.net/?retryWrites=true&w=majority")
+  .then(() => console.log("MongoDB Atlas Connected"))
+  .catch(err => console.error(err));
 
 
 // Start server
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
-  console.log("Server running on port", PORT);
+  console.log(`Server running on port ${PORT}`);
 });
