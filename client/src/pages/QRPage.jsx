@@ -1,7 +1,7 @@
 import { QRCodeCanvas } from "qrcode.react";
 
 function QRPage() {
-  const url = "http://172.22.10.68:5173"; // replace with YOUR network URL
+"const url = "https://whitestone-ordering.onrender.com";
 
   return (
     <div
