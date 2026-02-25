@@ -2,8 +2,8 @@ import { QRCodeCanvas } from "qrcode.react";
 
 function QRPage() {
 
-  // ✅ Correct production URL
-  const url = "https://whitestone-ordering.onrender.com/";
+  // ✅ USE YOUR FRONTEND URL
+  const url = "https://whitestone-client.onrender.com";
 
   return (
     <div
