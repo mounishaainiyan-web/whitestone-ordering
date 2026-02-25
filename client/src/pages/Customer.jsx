@@ -2,7 +2,8 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import menu from "../data/menu";
 
-const API = "http://172.22.10.68:5000/api/orders";
+// ✅ CHANGE: Use your Render backend URL
+const API = "https://whitestone-ordering.onrender.com/api/orders";
 
 function Customer() {
   const [cart, setCart] = useState([]);
@@ -56,41 +57,56 @@ function Customer() {
 
   // PLACE ORDER
   const placeOrder = async () => {
-    if (!tableNumber) {
-      alert("Enter Table Number");
-      return;
+    try {
+      if (!tableNumber) {
+        alert("Enter Table Number");
+        return;
+      }
+
+      if (cart.length === 0) {
+        alert("Cart is empty");
+        return;
+      }
+
+      const res = await axios.post(API, {
+        tableNumber,
+        items: cart,
+        totalAmount: getTotal(),
+        paymentMethod,
+        status: "Pending"
+      });
+
+      setOrderStatus(res.data.status || "Pending");
+
+      alert("Order placed successfully!");
+
+      setCart([]);
+      setShowCart(false);
+
+    } catch (error) {
+      console.error(error);
+      alert("Error placing order");
     }
-
-    if (cart.length === 0) {
-      alert("Cart is empty");
-      return;
-    }
-
-    const res = await axios.post(API, {
-      tableNumber,
-      items: cart,
-      totalAmount: getTotal(),
-      paymentMethod,
-      status: "Pending"
-    });
-
-    setOrderStatus(res.data.status);
-    setCart([]);
-    setShowCart(false);
   };
 
   // AUTO CHECK STATUS
   useEffect(() => {
     const interval = setInterval(async () => {
-      if (!tableNumber) return;
+      try {
+        if (!tableNumber) return;
 
-      const res = await axios.get(API);
-      const latestOrder = res.data.find(
-        o => o.tableNumber === tableNumber
-      );
+        const res = await axios.get(API);
 
-      if (latestOrder) {
-        setOrderStatus(latestOrder.status);
+        const latestOrder = res.data
+          .filter(o => o.tableNumber === tableNumber)
+          .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))[0];
+
+        if (latestOrder) {
+          setOrderStatus(latestOrder.status);
+        }
+
+      } catch (error) {
+        console.error("Status check error:", error);
       }
     }, 3000);
 
