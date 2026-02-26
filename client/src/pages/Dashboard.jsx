@@ -1,8 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import axios from "axios";
 
-const API = "http://localhost:5000/api/orders";
-
+const API = "https://whitestone-backend.onrender.com/api/orders";
 function Dashboard() {
   const [orders, setOrders] = useState([]);
   const previousOrderCount = useRef(0);
@@ -11,7 +10,6 @@ function Dashboard() {
     try {
       const res = await axios.get(API);
 
-      // 🔔 If new order arrives → play sound
       if (res.data.length > previousOrderCount.current) {
         playNotification();
       }
@@ -40,7 +38,6 @@ function Dashboard() {
 
   useEffect(() => {
     fetchOrders();
-
     const interval = setInterval(fetchOrders, 3000);
     return () => clearInterval(interval);
   }, []);

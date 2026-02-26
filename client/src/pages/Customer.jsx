@@ -2,9 +2,7 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import menu from "../data/menu";
 
-// ✅ CHANGE: Use your Render backend URL
-const API = "https://whitestone-ordering.onrender.com/api/orders";
-
+const API = "https://whitestone-backend.onrender.com/api/orders";
 function Customer() {
   const [cart, setCart] = useState([]);
   const [showCart, setShowCart] = useState(false);
@@ -12,7 +10,13 @@ function Customer() {
   const [paymentMethod, setPaymentMethod] = useState("Cash");
   const [orderStatus, setOrderStatus] = useState("");
 
-  // ADD ITEM
+  const getItemPrice = (item) => {
+    if (typeof item.price === "object") {
+      return item.price.single; // default use single price
+    }
+    return item.price;
+  };
+
   const addToCart = (item) => {
     const exist = cart.find(i => i.name === item.name);
 
@@ -27,7 +31,6 @@ function Customer() {
     }
   };
 
-  // INCREASE
   const increaseQty = (name) => {
     setCart(cart.map(item =>
       item.name === name
@@ -36,7 +39,6 @@ function Customer() {
     ));
   };
 
-  // DECREASE
   const decreaseQty = (name) => {
     setCart(
       cart
@@ -49,13 +51,11 @@ function Customer() {
     );
   };
 
-  // TOTAL
   const getTotal = () =>
     cart.reduce((total, item) =>
-      total + item.price * item.quantity, 0
+      total + getItemPrice(item) * item.quantity, 0
     );
 
-  // PLACE ORDER
   const placeOrder = async () => {
     try {
       if (!tableNumber) {
@@ -89,7 +89,6 @@ function Customer() {
     }
   };
 
-  // AUTO CHECK STATUS
   useEffect(() => {
     const interval = setInterval(async () => {
       try {
@@ -117,7 +116,6 @@ function Customer() {
     <div style={styles.container}>
       <h1 style={styles.title}>Whitestone Creamery</h1>
 
-      {/* MENU */}
       {menu.map(category => (
         <div key={category.category}>
           <h2 style={styles.category}>{category.category}</h2>
@@ -129,7 +127,17 @@ function Customer() {
               <div key={item.name} style={styles.menuItem}>
                 <div>
                   <h4 style={{ margin: 0 }}>{item.name}</h4>
-                  <p style={{ margin: 0 }}>₹ {item.price}</p>
+
+                  {typeof item.price === "object" ? (
+                    <div>
+                      <p style={{ margin: 0 }}>Single: ₹ {item.price.single}</p>
+                      <p style={{ margin: 0 }}>Double: ₹ {item.price.double}</p>
+                      <p style={{ margin: 0 }}>Family: ₹ {item.price.family}</p>
+                    </div>
+                  ) : (
+                    <p style={{ margin: 0 }}>₹ {item.price}</p>
+                  )}
+
                 </div>
 
                 {!cartItem ? (
@@ -152,7 +160,6 @@ function Customer() {
         </div>
       ))}
 
-      {/* VIEW CART BAR */}
       {cart.length > 0 && (
         <div
           style={styles.viewCartBar}
@@ -163,7 +170,6 @@ function Customer() {
         </div>
       )}
 
-      {/* CART MODAL */}
       {showCart && (
         <div style={styles.overlay}>
           <div style={styles.cartBox}>
@@ -179,7 +185,7 @@ function Customer() {
                   <button onClick={() => increaseQty(item.name)}>+</button>
                 </div>
 
-                <span>₹ {item.price * item.quantity}</span>
+                <span>₹ {getItemPrice(item) * item.quantity}</span>
               </div>
             ))}
 
@@ -204,10 +210,7 @@ function Customer() {
               <option value="UPI">UPI</option>
             </select>
 
-            <button
-              onClick={placeOrder}
-              style={styles.placeBtn}
-            >
+            <button onClick={placeOrder} style={styles.placeBtn}>
               Place Order
             </button>
 
@@ -221,7 +224,6 @@ function Customer() {
         </div>
       )}
 
-      {/* STATUS BADGE */}
       {orderStatus && (
         <div style={{
           position: "fixed",
@@ -241,105 +243,19 @@ function Customer() {
 }
 
 const styles = {
-  container: {
-    maxWidth: "800px",
-    margin: "auto",
-    padding: "20px",
-    fontFamily: "Arial"
-  },
-  title: {
-    textAlign: "center",
-    marginBottom: "20px"
-  },
-  category: {
-    marginTop: "30px",
-    borderBottom: "1px solid #ddd"
-  },
-  menuItem: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    padding: "12px 0",
-    borderBottom: "1px solid #f0f0f0"
-  },
-  addBtn: {
-    backgroundColor: "green",
-    color: "white",
-    border: "none",
-    padding: "6px 14px",
-    borderRadius: "6px",
-    cursor: "pointer"
-  },
-  qtyBox: {
-    display: "flex",
-    alignItems: "center",
-    gap: "8px"
-  },
-  viewCartBar: {
-    position: "fixed",
-    bottom: "20px",
-    left: "50%",
-    transform: "translateX(-50%)",
-    backgroundColor: "#111",
-    color: "white",
-    padding: "14px 20px",
-    borderRadius: "10px",
-    display: "flex",
-    justifyContent: "space-between",
-    width: "90%",
-    maxWidth: "500px",
-    cursor: "pointer"
-  },
-  overlay: {
-    position: "fixed",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: "rgba(0,0,0,0.5)",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center"
-  },
-  cartBox: {
-    backgroundColor: "white",
-    width: "90%",
-    maxWidth: "500px",
-    padding: "20px",
-    borderRadius: "10px"
-  },
-  cartItem: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: "10px"
-  },
-  input: {
-    width: "100%",
-    padding: "10px",
-    marginTop: "10px",
-    borderRadius: "6px",
-    border: "1px solid #ccc"
-  },
-  placeBtn: {
-    width: "100%",
-    padding: "12px",
-    backgroundColor: "black",
-    color: "white",
-    border: "none",
-    borderRadius: "8px",
-    marginTop: "10px",
-    cursor: "pointer"
-  },
-  closeBtn: {
-    width: "100%",
-    padding: "10px",
-    backgroundColor: "#ddd",
-    border: "none",
-    borderRadius: "8px",
-    marginTop: "10px",
-    cursor: "pointer"
-  }
+  container: { maxWidth: "800px", margin: "auto", padding: "20px", fontFamily: "Arial" },
+  title: { textAlign: "center", marginBottom: "20px" },
+  category: { marginTop: "30px", borderBottom: "1px solid #ddd" },
+  menuItem: { display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 0", borderBottom: "1px solid #f0f0f0" },
+  addBtn: { backgroundColor: "green", color: "white", border: "none", padding: "6px 14px", borderRadius: "6px", cursor: "pointer" },
+  qtyBox: { display: "flex", alignItems: "center", gap: "8px" },
+  viewCartBar: { position: "fixed", bottom: "20px", left: "50%", transform: "translateX(-50%)", backgroundColor: "#111", color: "white", padding: "14px 20px", borderRadius: "10px", display: "flex", justifyContent: "space-between", width: "90%", maxWidth: "500px", cursor: "pointer" },
+  overlay: { position: "fixed", top: 0, left: 0, right: 0, bottom: 0, backgroundColor: "rgba(0,0,0,0.5)", display: "flex", justifyContent: "center", alignItems: "center" },
+  cartBox: { backgroundColor: "white", width: "90%", maxWidth: "500px", padding: "20px", borderRadius: "10px" },
+  cartItem: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "10px" },
+  input: { width: "100%", padding: "10px", marginTop: "10px", borderRadius: "6px", border: "1px solid #ccc" },
+  placeBtn: { width: "100%", padding: "12px", backgroundColor: "black", color: "white", border: "none", borderRadius: "8px", marginTop: "10px", cursor: "pointer" },
+  closeBtn: { width: "100%", padding: "10px", backgroundColor: "#ddd", border: "none", borderRadius: "8px", marginTop: "10px", cursor: "pointer" }
 };
 
 export default Customer;
